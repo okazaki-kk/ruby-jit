@@ -2,14 +2,18 @@
 
 require 'fileutils'
 require 'pathname'
+require 'dotenv'
 
 require_relative 'workspace'
 require_relative 'database'
 require_relative 'blob'
 require_relative 'tree'
 require_relative 'entry'
+require_relative 'author'
+require_relative 'commit'
 
 command = ARGV.shift
+Dotenv.load
 
 case command
 when 'init'
@@ -49,6 +53,21 @@ when 'commit'
   database.store(tree)
 
   puts "tree: #{tree.oid}"
+
+  name = ENV.fetch('JIT_AUTHOR_NAME')
+  email = ENV.fetch('JIT_AUTHOR_EMAIL')
+  author = Author.new(name, email, Time.now)
+  message = $stdin.read
+
+  commit = Commit.new(tree.oid, author, message)
+  database.store(commit)
+
+  File.open(jit_path.join('HEAD'), File::WRONLY | File::CREAT) { |f| f.puts(commit.oid) }
+
+  puts "[master (root-commit) #{commit.oid}] #{message.lines.first}"
+
+  exit 0
+
 else
   warn "jit: '#{command}' is not a jit command. See 'jit --help'."
   exit 1
