@@ -1,4 +1,3 @@
-#! /usr/bin/env ruby
 # frozen_string_literal: true
 
 require 'fileutils'
@@ -18,7 +17,7 @@ require_relative 'directory'
 command = ARGV.shift
 Dotenv.load
 
-jit_path = ""
+jit_path = ''
 
 case command
 when 'init'
@@ -38,7 +37,7 @@ when 'init'
   exit 0
 
 when 'commit'
-  root_path = Pathname.new(Directory::ROOT_DIR)
+  root_path = Pathname.new(File.expand_path(Dir.getwd))
   jit_path = Pathname.new(File.expand_path(Dir.getwd)).join('.jit')
   db_path = jit_path.join('objects')
 
@@ -56,10 +55,8 @@ when 'commit'
     Entry.new(file, blob.oid, stat)
   end
 
-  tree = Tree.new(entries)
-  database.store(tree)
-
-  puts "tree: #{tree.oid}"
+  root = Tree.build(entries)
+  root.traverse { |tree| database.store(tree) }
 
   parent = refs.read_head
   name = ENV.fetch('JIT_AUTHOR_NAME')
@@ -67,12 +64,12 @@ when 'commit'
   author = Author.new(name, email, Time.now)
   message = $stdin.read
 
-  commit = Commit.new(parent, tree.oid, author, message)
+  commit = Commit.new(parent, root.oid, author, message)
   database.store(commit)
   refs.update_head(commit.oid)
 
   is_root = parent.nil? ? 'root-commit' : ''
-  puts "[#{is_root}#{commit.oid}] #{message.lines.first}}"
+  puts "[#{is_root} #{commit.oid}] #{message.lines.first}"
   exit 0
 
 else
