@@ -12,7 +12,6 @@ require_relative 'entry'
 require_relative 'author'
 require_relative 'commit'
 require_relative 'refs'
-require_relative 'directory'
 
 command = ARGV.shift
 Dotenv.load
