@@ -13,9 +13,12 @@ require_relative 'entry'
 require_relative 'author'
 require_relative 'commit'
 require_relative 'refs'
+require_relative 'directory'
 
 command = ARGV.shift
 Dotenv.load
+
+jit_path = ""
 
 case command
 when 'init'
@@ -35,8 +38,8 @@ when 'init'
   exit 0
 
 when 'commit'
-  root_path = Pathname.new(Dir.getwd)
-  jit_path = root_path.join('.jit')
+  root_path = Pathname.new(Directory::ROOT_DIR)
+  jit_path = Pathname.new(File.expand_path(Dir.getwd)).join('.jit')
   db_path = jit_path.join('objects')
 
   workspace = Workspace.new(root_path)
