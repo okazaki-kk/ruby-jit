@@ -6,6 +6,8 @@ require 'pathname'
 require_relative 'workspace'
 require_relative 'database'
 require_relative 'blob'
+require_relative 'tree'
+require_relative 'entry'
 
 command = ARGV.shift
 
@@ -34,12 +36,19 @@ when 'commit'
   workspace = Workspace.new(root_path)
   database = Database.new(db_path)
 
-  workspace.list_files.each do |path|
-    data = workspace.read_file(path)
+  entries = workspace.list_files.map do |file|
+    data = workspace.read_file(file)
     blob = Blob.new(data)
 
     database.store(blob)
+
+    Entry.new(file, blob.oid)
   end
+
+  tree = Tree.new(entries)
+  database.store(tree)
+
+  puts "tree: #{tree.oid}"
 else
   warn "jit: '#{command}' is not a jit command. See 'jit --help'."
   exit 1
