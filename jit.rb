@@ -3,6 +3,8 @@
 require 'fileutils'
 require 'pathname'
 
+require_relative 'workspace'
+
 command = ARGV.shift
 
 case command
@@ -21,6 +23,14 @@ when 'init'
 
   puts "initialized empty jit repository in #{jit_path}"
   exit 0
+
+when 'commit'
+  root_path = Pathname.new(Dir.getwd)
+  jit_path = root_path.join('.jit')
+  db_path = jit_path.join('objects')
+
+  workspace = Workspace.new(root_path)
+  puts workspace.list_files
 else
   warn "jit: '#{command}' is not a jit command. See 'jit --help'."
   exit 1
