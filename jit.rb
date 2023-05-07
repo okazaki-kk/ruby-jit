@@ -11,6 +11,7 @@ require_relative 'tree'
 require_relative 'entry'
 require_relative 'author'
 require_relative 'commit'
+require_relative 'refs'
 
 command = ARGV.shift
 Dotenv.load
@@ -39,6 +40,7 @@ when 'commit'
 
   workspace = Workspace.new(root_path)
   database = Database.new(db_path)
+  refs = Refs.new(jit_path)
 
   entries = workspace.list_files.map do |file|
     data = workspace.read_file(file)
@@ -54,18 +56,18 @@ when 'commit'
 
   puts "tree: #{tree.oid}"
 
+  parent = refs.read_head
   name = ENV.fetch('JIT_AUTHOR_NAME')
   email = ENV.fetch('JIT_AUTHOR_EMAIL')
   author = Author.new(name, email, Time.now)
   message = $stdin.read
 
-  commit = Commit.new(tree.oid, author, message)
+  commit = Commit.new(parent, tree.oid, author, message)
   database.store(commit)
+  refs.update_head(commit.oid)
 
-  File.open(jit_path.join('HEAD'), File::WRONLY | File::CREAT) { |f| f.puts(commit.oid) }
-
-  puts "[master (root-commit) #{commit.oid}] #{message.lines.first}"
-
+  is_root = parent.nil? ? 'root-commit' : ''
+  puts "[#{is_root}#{commit.oid}] #{message.lines.first}}"
   exit 0
 
 else
