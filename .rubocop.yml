@@ -1,0 +1,44 @@
+AllCops:
+  NewCops: enable
+  SuggestExtensions: false
+  Exclude:
+    - vendor/**/*
+    - bin/**/*
+
+Layout/LineLength:
+  Max: 215
+
+Style/Documentation:
+  Enabled: false
+
+Style/MultilineIfModifier:
+  Enabled: false
+
+Style/RaiseArgs:
+  Enabled: false
+
+Metrics/AbcSize:
+  Max: 45
+
+Metrics/BlockLength:
+  Max: 30
+  Exclude:
+    - spec/**/*_spec.rb
+
+Metrics/ClassLength:
+  Max: 300
+
+Metrics/CyclomaticComplexity:
+  Max: 15
+
+Metrics/ParameterLists:
+  MaxOptionalParameters: 4
+
+Metrics/MethodLength:
+  Max: 32
+
+Metrics/ModuleLength:
+  Max: 220
+
+Metrics/PerceivedComplexity:
+  Max: 15
