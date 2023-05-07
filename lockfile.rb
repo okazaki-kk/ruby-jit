@@ -12,7 +12,7 @@ class Lockfile
   end
 
   def hold_for_update
-    unless @lock.nil?
+    unless @lock
       flags = File::RDWR | File::CREAT | File::EXCL
       @lock = File.open(@lock_path, flags)
     end
