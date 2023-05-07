@@ -14,4 +14,8 @@ class Workspace
   def read_file(path)
     File.read(@pathname.join(path))
   end
+
+  def file_stat(path)
+    File.stat(@pathname.join(path))
+  end
 end

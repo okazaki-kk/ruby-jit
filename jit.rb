@@ -1,3 +1,4 @@
+#! /usr/bin/env ruby
 # frozen_string_literal: true
 
 require 'fileutils'
@@ -48,7 +49,8 @@ when 'commit'
 
     database.store(blob)
 
-    Entry.new(file, blob.oid)
+    stat = workspace.file_stat(file)
+    Entry.new(file, blob.oid, stat)
   end
 
   tree = Tree.new(entries)
