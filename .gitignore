@@ -1,3 +1,5 @@
 vendor/
 .jit/
 .env
+.ruby-version
+Gemfile.lock
