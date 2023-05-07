@@ -4,6 +4,8 @@ require 'fileutils'
 require 'pathname'
 
 require_relative 'workspace'
+require_relative 'database'
+require_relative 'blob'
 
 command = ARGV.shift
 
@@ -30,7 +32,14 @@ when 'commit'
   db_path = jit_path.join('objects')
 
   workspace = Workspace.new(root_path)
-  puts workspace.list_files
+  database = Database.new(db_path)
+
+  workspace.list_files.each do |path|
+    data = workspace.read_file(path)
+    blob = Blob.new(data)
+
+    database.store(blob)
+  end
 else
   warn "jit: '#{command}' is not a jit command. See 'jit --help'."
   exit 1
